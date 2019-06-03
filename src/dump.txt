@@ -1,0 +1,41 @@
+const MySection = forwardRef((props, ref) => (
+  <section ref={ref}>
+    <h1>Hey KENT!</h1>
+    <h2>Start Selecting This Tasty 🍉</h2>
+  </section>
+));
+
+
+    <MySection ref={myRef} />
+      {/* <span
+        style={{
+          visibility: !!text ? "visible" : "hidden",
+          position: "absolute",
+          left: (position.x + position.width) / 2,
+          top: position.y - 15
+        }}
+      >
+        Ahan
+      </span> */}
+      {/* <pre
+        style={{
+          textAlign: "left",
+          width: "800px",
+          margin: "0 auto"
+        }}
+      >
+        {JSON.stringify(position, null, 2)}
+      </pre>
+
+      <hr />
+
+      <pre
+        style={{
+          textAlign: "left",
+          width: "800px",
+          margin: "0 auto"
+        }}
+      > */}
+      {/* {mPos ? JSON.stringify(mPos, null, 2) : null}
+      </pre> */}
+

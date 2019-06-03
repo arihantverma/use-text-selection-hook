@@ -1,0 +1,51 @@
+.App {
+  font-family: sans-serif;
+  text-align: center;
+}
+
+#pop {
+  position: absolute;
+  background-image: linear-gradient(to bottom,rgba(49,49,47,.99),#262625);
+  background-repeat: repeat-x;
+  border-radius: 5px;
+  padding: 0 10px;
+  color: white;
+  line-height: 44px;
+  display: inline-block;
+}
+#pop[x-placement="top"] {
+  margin-bottom: 7px;
+}
+#pop[x-placement="bottom"] {
+  background-image: linear-gradient(to top,rgba(49,49,47,.99),#262625);
+  margin-top: 7px;
+}
+
+#pop[x-placement] {
+  opacity: 1;
+  pointer-events: auto;
+}
+#pop, #pop[x-out-of-boundaries] {
+  opacity: 0;
+  pointer-events: none;
+}
+.x-arrow {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background-color: #262625;
+  transform: rotate(45deg);
+  z-index: -1;
+}
+[x-placement="top"] [x-arrow] {
+  margin-bottom: -7px;
+  bottom: 0;
+}
+[x-placement="bottom"] [x-arrow] {
+  margin-top: -7px;
+  top: 0;
+}
+i {
+  width: 1.4em;
+  text-align: center;
+}
