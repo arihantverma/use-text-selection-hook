@@ -14,7 +14,9 @@ const defaultPosition = {
 // for example checking for siblings ( no point in going further)
 function isItselfOrContains(node, container) {
   while (node) {
-    if (node === container) return true;
+    if (node === container) {
+      return true;
+    }
     node = node.parentNode;
   }
   return false;
@@ -38,17 +40,32 @@ function elContainsTextSelection(textSelectionObj, el) {
  * a particular element (no ref is provided) prevent necessitating ref
  * and don't run elContainsTextSelection
  */
-function useTextSelection(ref, popperRef) {
+function useTextSelection(ref) {
   const [text, setText] = useState('');
   const [position, setPosition] = useState(defaultPosition);
+  const [shouldDoSomethingAboutText, setShouldDoSomethingAboutText] = useState(
+    false,
+  );
+
+  const resetStates = () => {
+    setText('');
+    setPosition(defaultPosition);
+    setShouldDoSomethingAboutText(false);
+  };
 
   useEffect(() => {
     const el = ref && ref.current;
 
-    if (!el instanceof HTMLElement) return;
-    if (!window.getSelection) return;
+    if (!el instanceof HTMLElement) {
+      resetStates();
+      return;
+    } // do we need this at all ?
+    if (!window.getSelection) {
+      resetStates();
+      return;
+    }
 
-    function selectionHandler() {
+    function selectionHandler(e) {
       const textSelectionObj = window.getSelection();
       const totalText = textSelectionObj.toString();
 
@@ -58,9 +75,22 @@ function useTextSelection(ref, popperRef) {
           setPosition(textSelectionObj.getRangeAt(0).getBoundingClientRect());
         }
       });
-      if (!totalText) return; // selected text is an empty string
+      if (!totalText) {
+        resetStates();
+        return;
+      } // selected text is an empty string
 
-      if (!elContainsTextSelection(textSelectionObj, el)) return;
+      const containedTextSelection = elContainsTextSelection(
+        textSelectionObj,
+        el,
+      );
+
+      setShouldDoSomethingAboutText(containedTextSelection);
+
+      if (!containedTextSelection) {
+        resetStates();
+        return;
+      }
 
       // 🐨 calculation to find total text
       const refinedText = totalText; // replace this line to do 🐨
@@ -76,7 +106,15 @@ function useTextSelection(ref, popperRef) {
     return () => el.removeEventListener('selectionchange', selectionHandler);
   }, [ref]);
 
-  return { text, position, setText, setPosition, defaultPosition };
+  return {
+    text,
+    position,
+    setText,
+    setPosition,
+    defaultPosition,
+    shouldDoSomethingAboutText,
+    setShouldDoSomethingAboutText,
+  };
 }
 
 export default useTextSelection;

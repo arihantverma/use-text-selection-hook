@@ -36,7 +36,9 @@ const Paragraph = forwardRef((props, ref) => (
 ));
 
 const ShareToolTip = () => (
-  <span style={{ background: 'grey' }}>Share On Twitter</span>
+  <span style={{ background: 'grey' }}>
+    <a href="https://google.com">Share On Twitter</a>
+  </span>
 );
 // <div id="pop" role="tooltip">
 //   <i className="fa fa-bold"></i>
@@ -49,21 +51,61 @@ const ShareToolTip = () => (
 function App() {
   const paragraphRef = useRef();
   const [popperRef, setPopperRef] = useState();
+  const [mousePos, setMousePos] = useState();
   const {
     text,
     position,
     setText,
     setPosition,
     defaultPosition,
-  } = useTextSelection(paragraphRef, popperRef);
+    shouldDoSomethingAboutText,
+    setShouldDoSomethingAboutText,
+  } = useTextSelection(paragraphRef);
   const { shouldShowPopper, setShouldShowPopper } = useShowPopper();
   const [mPos, setmPos] = useState();
 
   const onOutsideGoingHandler = () => {
+    console.log('outside click handler fired');
     setText('');
     setPosition(defaultPosition);
     setShouldShowPopper(false);
+    setShouldDoSomethingAboutText(false);
   };
+
+  useEffect(() => {
+    const onmousemoveHandler = event => {
+      var eventDoc, doc, body;
+
+      event = event || window.event; // IE-ism
+
+      // If pageX/Y aren't available and clientX/Y are,
+      // calculate pageX/Y - logic taken from jQuery.
+      // (This is to support old IE)
+      if (event.pageX == null && event.clientX != null) {
+        eventDoc = (event.target && event.target.ownerDocument) || document;
+        doc = eventDoc.documentElement;
+        body = eventDoc.body;
+
+        event.pageX =
+          event.clientX +
+          ((doc && doc.scrollLeft) || (body && body.scrollLeft) || 0) -
+          ((doc && doc.clientLeft) || (body && body.clientLeft) || 0);
+        event.pageY =
+          event.clientY +
+          ((doc && doc.scrollTop) || (body && body.scrollTop) || 0) -
+          ((doc && doc.clientTop) || (body && body.clientTop) || 0);
+      }
+
+      setMousePos({
+        mouseX: event.pageX,
+        mouseY: event.pageY,
+      });
+    };
+    document.addEventListener('onmousemove', onmousemoveHandler);
+
+    return () =>
+      document.removeEventListener('onmousemove', onmousemoveHandler);
+  }, []);
 
   const virtualReferenceElement = new VirtualReference(position);
 
@@ -81,12 +123,24 @@ function App() {
             setPopperRef(ref.current);
             return (
               <div ref={ref} style={style} data-placement={placement}>
-                {text && shouldShowPopper ? <ShareToolTip /> : null}
+                {text && (shouldShowPopper && shouldDoSomethingAboutText) ? (
+                  <ShareToolTip />
+                ) : null}
                 <div ref={arrowProps.ref} style={arrowProps.style} />
               </div>
             );
           }}
         </Popper>
+
+        <pre style={{ textAlign: 'left', width: '500px', margin: '0 auto' }}>
+          {JSON.stringify(position, null, 2)}
+        </pre>
+
+        <h2>Mouse Position</h2>
+
+        <pre style={{ textAlign: 'left', width: '500px', margin: '0 auto' }}>
+          {JSON.stringify(mousePos, null, 2)}
+        </pre>
       </Foco>
     </div>
   );
